@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Infinite Scroll of Nonsense — Extreme Edition</title>
+<style>
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+    75% { transform: rotate(3deg); }
+  }
+  @keyframes floatBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    20% { transform: translate(-2px, 2px) rotate(-2deg); }
+    40% { transform: translate(2px, -2px) rotate(2deg); }
+    60% { transform: translate(-2px, -2px) rotate(-1deg); }
+    80% { transform: translate(2px, 2px) rotate(1deg); }
+  }
+  @keyframes glitch {
+    0% {
+      clip-path: inset(0 0 0 0);
+      transform: translate(0);
+      opacity: 1;
+      filter: none;
+    }
+    20% {
+      clip-path: inset(10% 0 40% 0);
+      transform: translate(-5px, -2px);
+      opacity: 0.8;
+      filter: hue-rotate(20deg);
+    }
+    40% {
+      clip-path: inset(50% 0 10% 0);
+      transform: translate(5px, 2px);
+      opacity: 0.9;
+      filter: hue-rotate(-20deg);
+    }
+    60% {
+      clip-path: inset(20% 0 30% 0);
+      transform: translate(-3px, 3px);
+      opacity: 0.85;
+      filter: saturate(200%);
+    }
+    80% {
+      clip-path: inset(40% 0 20% 0);
+      transform: translate(3px, -3px);
+      opacity: 0.9;
+      filter: contrast(150%);
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+      transform: translate(0);
+      opacity: 1;
+      filter: none;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: #111;
+    color: #eee;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    overflow-x: hidden;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .nonsense-item {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 2s ease;
+    position: relative;
+  }
+  .phrase {
+    font-size: 1.3rem;
+    display: inline-block;
+    animation: wiggle 3s ease-in-out infinite;
+  }
+  .shape {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    animation: floatBounce 4s ease-in-out infinite;
+    position: relative;
+  }
+  img {
+    max-width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 0 10px #888;
+    animation: shake 5s ease-in-out infinite;
+    position: relative;
+  }
+  /* Glitch effect container */
+  .glitch {
+    animation: glitch 1s ease-in-out;
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="container"></div>
+
+<script>
+  const container = document.getElementById('container');
+
+  // Random nonsense phrases
+  const phrases = [
+    "The purple hamster sings at midnight.",
+    "Invisible bananas float silently.",
+    "Quantum tacos jump over the moon.",
+    "Dancing pencils paint the silence.",
+    "Clouds taste like forgotten dreams.",
+    "Fish ride bicycles underwater.",
+    "Time melts like rainbow cheese.",
+    "Whispering shadows juggle stars.",
+    "Toasters dream of electric sheep.",
+    "Cactus balloons explode softly."
+  ];
+
+  // Random image URLs (free, small weird images or placeholders)
+  const images = [
+    "https://placekitten.com/200/140",
+    "https://placebear.com/200/140",
+    "https://baconmockup.com/200/140",
+    "https://www.fillmurray.com/200/140",
+    "https://www.placecage.com/200/140"
+  ];
+
+  // Sounds: random quirky short sounds in base64 for easy embed (small beep sounds)
+  const soundsData = [
+    "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAD//w==", // very short beep
+    "data:audio/wav;base64,UklGRlgAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAD9Pw==", // another short beep
+    "data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAD//w==", // beep
+  ];
+
+  function playRandomSound() {
+    const audio = new Audio(soundsData[Math.floor(Math.random() * soundsData.length)]);
+    audio.volume = 0.1 + Math.random() * 0.2;
+    audio.play();
+  }
+
+  // Generate a random color
+  function randomColor() {
+    const r = Math.floor(Math.random()*256);
+    const g = Math.floor(Math.random()*256);
+    const b = Math.floor(Math.random()*256);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  // Create a random shape element
+  function createShape() {
+    const shape = document.createElement('div');
+    shape.classList.add('shape');
+    const shapeType = Math.floor(Math.random() * 3);
+    shape.style.backgroundColor = randomColor();
+
+    if (shapeType === 0) {
+      // Circle
+      shape.style.borderRadius = '50%';
+    } else if (shapeType === 1) {
+      // Square (default)
+      shape.style.borderRadius = '0';
+    } else {
+      // Triangle using CSS trick
+      shape.style.width = '0';
+      shape.style.height = '0';
+      shape.style.borderLeft = '50px solid transparent';
+      shape.style.borderRight = '50px solid transparent';
+      shape.style.borderBottom = `100px solid ${randomColor()}`;
+      shape.style.backgroundColor = 'transparent';
+    }
+    return shape;
+  }
+
+  // Create a nonsense item: phrase, image or shape
+  function createNonsenseItem() {
+    const item = document.createElement('div');
+    item.classList.add('nonsense-item');
+    item.style.backgroundColor = randomColor();
+
+    const choice = Math.floor(Math.random() * 3);
+
+    if (choice === 0) {
+      // Phrase
+      const phraseEl = document.createElement('div');
+      phraseEl.classList.add('phrase');
+      phraseEl.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+      item.appendChild(phraseEl);
+
+    } else if (choice === 1) {
+      // Image
+      const img = document.createElement('img');
+      img.src = images[Math.floor(Math.random() * images.length)];
+      img.alt = "Random image";
+      item.appendChild(img);
+
+    } else {
+      // Shape
+      const shape = createShape();
+      item.appendChild(shape);
+    }
+
+    return item;
+  }
+
+  // Add multiple nonsense items initially
+  function addInitialItems(count = 20) {
+    for (let i = 0; i < count; i++) {
+      const item = createNonsenseItem();
+      container.appendChild(item);
+    }
+  }
+
+  // Add more items when scrolling near bottom
+  window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+      // Add 5 more items
+      for (let i = 0; i < 5; i++) {
+        const item = createNonsenseItem();
+        container.appendChild(item);
+      }
+      playRandomSound(); // Play sound on scroll near bottom
+    }
+  });
+
+  // Rearrange items colors randomly every 4 seconds + randomly glitch some items
+  setInterval(() => {
+    const items = document.querySelectorAll('.nonsense-item');
+    items.forEach(item => {
+      item.style.backgroundColor = randomColor();
+      if (item.querySelector('.shape')) {
+        const shape = item.querySelector('.shape');
+        shape.style.backgroundColor = randomColor();
+        if (shape.style.borderBottomColor) {
+          shape.style.borderBottomColor = randomColor();
+        }
+      }
+      // 10% chance to glitch
+      if (Math.random() < 0.1) {
+        item.classList.add('glitch');
+        setTimeout(() => item.classList.remove('glitch'), 1000);
+      }
+    });
+  }, 4000);
+
+  // Play sound on clicking any nonsense item
+  container.addEventListener('click', (e) => {
+    let target = e.target;
+    while (target && !target.classList.contains('nonsense-item')) {
+      target = target.parentElement;
+    }
+    if (target) {
+      playRandomSound();
+    }
+  });
+
+  addInitialItems();
+</script>
+</body>
+</html>
